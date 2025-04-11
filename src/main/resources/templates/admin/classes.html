@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Class List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Class List</h2>
+    <a th:href="@{/admin/classes/new}" class="btn btn-primary mb-3">Add New Class</a>
+    <form th:action="@{/admin/classes}" method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="keyword" class="form-control" th:value="${keyword}" placeholder="Search by name">
+            <button type="submit" class="btn btn-secondary">Search</button>
+        </div>
+    </form>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Semester</th>
+            <th>Subjects</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="class : ${classes}">
+            <td th:text="${class.classId}"></td>
+            <td th:text="${class.name}"></td>
+            <td th:text="${class.semester}"></td>
+            <td>
+                <span th:each="subject, iter : ${class.subjects}" th:text="${subject.name} + (iter.last ? '' : ', ')"></span>
+            </td>
+            <td>
+                <a th:href="@{/admin/classes/delete/{id}(id=${class.classId})}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

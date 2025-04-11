@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Add Class</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Add New Class</h2>
+  <form th:action="@{/admin/classes/save}" th:object="${class}" method="post">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" class="form-control" id="name" th:field="*{name}" required>
+    </div>
+    <div class="mb-3">
+      <label for="semester" class="form-label">Semester</label>
+      <input type="text" class="form-control" id="semester" th:field="*{semester}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Subjects</label>
+      <div th:each="subject : ${subjects}">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" th:field="*{subjects}" th:value="${subject.subjectId}">
+          <label class="form-check-label" th:text="${subject.name}"></label>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a th:href="@{/admin/classes}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Record Payment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Record New Payment</h2>
+    <form th:action="@{/admin/payments/save}" th:object="${payment}" method="post">
+        <div class="mb-3">
+            <label for="student" class="form-label">Student</label>
+            <select class="form-control" id="student" th:field="*{student}">
+                <option th:each="student : ${students}" th:value="${student.studentId}" th:text="${student.firstName} + ' ' + ${student.lastName}"></option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="amount" class="form-label">Amount</label>
+            <input type="number" step="0.01" class="form-control" id="amount" th:field="*{amount}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a th:href="@{/admin/payments}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+</body>
+</html>
