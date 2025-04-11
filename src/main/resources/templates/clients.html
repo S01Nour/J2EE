@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des clients</title>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- pour l'instant, version rapide -->
+</head>
+<body class="bg-gray-100 p-8">
+<h1 class="text-3xl font-bold text-center mb-6">Liste des Clients</h1>
+
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+    <table class="table-auto w-full text-left">
+        <thead>
+        <tr class="bg-gray-200">
+            <th class="px-4 py-2">Nom</th>
+            <th class="px-4 py-2">Prénom</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="client : ${clients}" class="border-t">
+            <td class="px-4 py-2" th:text="${client.nom}">Nom</td>
+            <td class="px-4 py-2" th:text="${client.prenom}">Prénom</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
