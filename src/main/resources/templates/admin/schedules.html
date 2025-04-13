@@ -5,6 +5,53 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <div class="container-fluid">
+        <!-- School Logo -->
+        <a class="navbar-brand" href="#">
+            <img src="/CSS/pics/school.png" alt="School Logo" style="width: 50px; height: 50px; margin-right: 10px;">
+            Student Management
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/students">Students</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/classes">Classes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/payments">Payments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/schedules">Schedules</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/subjects">Subjects</a>
+                </li>
+            </ul>
+            <!-- Login/Logout on the far right -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/login">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
 <div class="container mt-5">
     <h2>Schedule List</h2>
     <a th:href="@{/admin/schedules/new}" class="btn btn-primary mb-3">Add New Schedule</a>
