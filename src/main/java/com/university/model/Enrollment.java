@@ -1,10 +1,11 @@
 package com.university.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "enrollment")
+@IdClass(EnrollmentId.class) // Add this annotation
 public class Enrollment {
 
     @Id
@@ -15,16 +16,16 @@ public class Enrollment {
     @Id
     @ManyToOne
     @JoinColumn(name = "class_id")
-    private Class classEntity;
+    private SchoolClass classEntity;
 
     @Temporal(TemporalType.DATE)
     private Date enrollmentDate;
 
-    // Getters and Setters
+    // Getters and Setters remain the same
     public Student getStudent() { return student; }
     public void setStudent(Student student) { this.student = student; }
-    public Class getClassEntity() { return classEntity; }
-    public void setClassEntity(Class classEntity) { this.classEntity = classEntity; }
+    public SchoolClass getClassEntity() { return classEntity; }
+    public void setClassEntity(SchoolClass classEntity) { this.classEntity = classEntity; }
     public Date getEnrollmentDate() { return enrollmentDate; }
     public void setEnrollmentDate(Date enrollmentDate) { this.enrollmentDate = enrollmentDate; }
 }

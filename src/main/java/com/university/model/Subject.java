@@ -1,36 +1,27 @@
 package com.university.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
-
+import jakarta.persistence.*;
 @Entity
-@Table(name = "subject")
+@Getter
+@Setter
 public class Subject {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long subjectId;
 
-    @NotBlank(message = "Name is required")
-    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+    @Column(nullable = false)
     private String name;
 
-    @Min(value = 1, message = "Credits must be at least 1")
+    @Column(nullable = false)
     private int credits;
 
     @ManyToMany(mappedBy = "subjects")
-    private List<Class> classes;
+    private List<SchoolClass> classes;
 
-    // Getters and Setters
-    public Long getSubjectId() { return subjectId; }
-    public void setSubjectId(Long subjectId) { this.subjectId = subjectId; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public int getCredits() { return credits; }
-    public void setCredits(int credits) { this.credits = credits; }
-    public List<Class> getClasses() { return classes; }
-    public void setClasses(List<Class> classes) { this.classes = classes; }
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
+    private List<Schedule> schedules;
 }

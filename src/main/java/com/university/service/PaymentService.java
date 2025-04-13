@@ -32,6 +32,6 @@ public class PaymentService {
     }
 
     public List<Payment> findByStudent(Student student) {
-        return paymentRepository.findByStudent(student);
+        return paymentRepository.findByStudentStudentId(student.getStudentId());
     }
 }

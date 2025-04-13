@@ -1,6 +1,6 @@
 package com.university.service;
 
-import com.university.model.Class;
+import com.university.model.SchoolClass;
 import com.university.model.Schedule;
 import com.university.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +32,11 @@ public class ScheduleService {
         scheduleRepository.deleteById(id);
     }
 
-    public List<Schedule> findByClass(Class classEntity) {
-        return scheduleRepository.findByClassEntity(classEntity);
+    public List<Schedule> findByClass(SchoolClass classEntity) {
+        return scheduleRepository.findByClassEntity_ClassId(classEntity.getClassId());
     }
 
-    public List<Schedule> findByClasses(List<Class> classes) {
-        return scheduleRepository.findByClassEntityIn(classes);
+    public List<Schedule> findByClasses(List<SchoolClass> classes) {
+        return scheduleRepository.findSchedulesByStudentId(classes.get(0).getClassId());
     }
 }

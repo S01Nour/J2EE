@@ -1,6 +1,10 @@
 package com.university.controller;
 
-import com.university.model.*;
+import com.university.model.SchoolClass;
+import com.university.model.Student;
+import com.university.model.Subject;
+import com.university.model.Payment;
+import com.university.model.Schedule;
 import com.university.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -8,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import com.university.service.ClassService;
 
 import javax.validation.Valid;
 import java.util.Date;
@@ -17,12 +23,14 @@ import java.util.List;
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
-
     @Autowired
     private StudentService studentService;
 
     @Autowired
     private ClassService classService;
+
+    @Autowired
+    private SubjectService subjectService;
 
     @Autowired
     private PaymentService paymentService;
@@ -32,8 +40,8 @@ public class AdminController {
 
     // Students
     @GetMapping("/students")
-    public String listStudents(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
-        List<Student> students = studentService.search(keyword);
+    public String listStudents(Model model, @RequestParam(required = false) String keyword) {
+        List<Student> students = keyword == null ? studentService.findAll() : studentService.search(keyword);
         model.addAttribute("students", students);
         model.addAttribute("keyword", keyword);
         return "admin/students";
@@ -47,13 +55,12 @@ public class AdminController {
 
     @GetMapping("/students/edit/{id}")
     public String editStudent(@PathVariable Long id, Model model) {
-        Student student = studentService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid student ID"));
-        model.addAttribute("student", student);
+        model.addAttribute("student", studentService.findById(id));
         return "admin/student-form";
     }
 
     @PostMapping("/students/save")
-    public String saveStudent(@Valid @ModelAttribute("student") Student student, BindingResult result) {
+    public String saveStudent(@Valid @ModelAttribute Student student, BindingResult result) {
         if (result.hasErrors()) {
             return "admin/student-form";
         }
@@ -69,8 +76,8 @@ public class AdminController {
 
     // Classes
     @GetMapping("/classes")
-    public String listClasses(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
-        List<Class> classes = classService.search(keyword);
+    public String listClasses(Model model, @RequestParam(required = false) String keyword) {
+        List<SchoolClass> classes = keyword == null ? classService.findAll() : classService.search(keyword);
         model.addAttribute("classes", classes);
         model.addAttribute("keyword", keyword);
         return "admin/classes";
@@ -78,22 +85,13 @@ public class AdminController {
 
     @GetMapping("/classes/new")
     public String newClass(Model model) {
-        model.addAttribute("classEntity", new Class());
-        return "admin/class-form";
-    }
-
-    @GetMapping("/classes/edit/{id}")
-    public String editClass(@PathVariable Long id, Model model) {
-        Class classEntity = classService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid class ID"));
-        model.addAttribute("classEntity", classEntity);
+        model.addAttribute("class", new SchoolClass());
+        model.addAttribute("subjects", subjectService.findAll());
         return "admin/class-form";
     }
 
     @PostMapping("/classes/save")
-    public String saveClass(@Valid @ModelAttribute("classEntity") Class classEntity, BindingResult result) {
-        if (result.hasErrors()) {
-            return "admin/class-form";
-        }
+    public String saveClass(@ModelAttribute SchoolClass classEntity) {
         classService.save(classEntity);
         return "redirect:/admin/classes";
     }
@@ -104,11 +102,37 @@ public class AdminController {
         return "redirect:/admin/classes";
     }
 
+    // Subjects
+    @GetMapping("/subjects")
+    public String listSubjects(Model model, @RequestParam(required = false) String keyword) {
+        List<Subject> subjects = keyword == null ? subjectService.findAll() : subjectService.search(keyword);
+        model.addAttribute("subjects", subjects);
+        model.addAttribute("keyword", keyword);
+        return "admin/subjects";
+    }
+
+    @GetMapping("/subjects/new")
+    public String newSubject(Model model) {
+        model.addAttribute("subject", new Subject());
+        return "admin/subject-form";
+    }
+
+    @PostMapping("/subjects/save")
+    public String saveSubject(@ModelAttribute Subject subject) {
+        subjectService.save(subject);
+        return "redirect:/admin/subjects";
+    }
+
+    @GetMapping("/subjects/delete/{id}")
+    public String deleteSubject(@PathVariable Long id) {
+        subjectService.deleteById(id);
+        return "redirect:/admin/subjects";
+    }
+
     // Payments
     @GetMapping("/payments")
     public String listPayments(Model model) {
-        List<Payment> payments = paymentService.findAll();
-        model.addAttribute("payments", payments);
+        model.addAttribute("payments", paymentService.findAll());
         model.addAttribute("students", studentService.findAll());
         return "admin/payments";
     }
@@ -120,20 +144,9 @@ public class AdminController {
         return "admin/payment-form";
     }
 
-    @GetMapping("/payments/edit/{id}")
-    public String editPayment(@PathVariable Long id, Model model) {
-        Payment payment = paymentService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid payment ID"));
-        model.addAttribute("payment", payment);
-        model.addAttribute("students", studentService.findAll());
-        return "admin/payment-form";
-    }
-
     @PostMapping("/payments/save")
-    public String savePayment(@Valid @ModelAttribute("payment") Payment payment, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            model.addAttribute("students", studentService.findAll());
-            return "admin/payment-form";
-        }
+    public String savePayment(@ModelAttribute Payment payment) {
+        payment.setDate(new Date());
         paymentService.save(payment);
         return "redirect:/admin/payments";
     }
@@ -147,8 +160,7 @@ public class AdminController {
     // Schedules
     @GetMapping("/schedules")
     public String listSchedules(Model model) {
-        List<Schedule> schedules = scheduleService.findAll();
-        model.addAttribute("schedules", schedules);
+        model.addAttribute("schedules", scheduleService.findAll());
         model.addAttribute("classes", classService.findAll());
         return "admin/schedules";
     }
@@ -157,23 +169,12 @@ public class AdminController {
     public String newSchedule(Model model) {
         model.addAttribute("schedule", new Schedule());
         model.addAttribute("classes", classService.findAll());
-        return "admin/schedule-form";
-    }
-
-    @GetMapping("/schedules/edit/{id}")
-    public String editSchedule(@PathVariable Long id, Model model) {
-        Schedule schedule = scheduleService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid schedule ID"));
-        model.addAttribute("schedule", schedule);
-        model.addAttribute("classes", classService.findAll());
+        model.addAttribute("subjects", subjectService.findAll());
         return "admin/schedule-form";
     }
 
     @PostMapping("/schedules/save")
-    public String saveSchedule(@Valid @ModelAttribute("schedule") Schedule schedule, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            model.addAttribute("classes", classService.findAll());
-            return "admin/schedule-form";
-        }
+    public String saveSchedule(@ModelAttribute Schedule schedule) {
         scheduleService.save(schedule);
         return "redirect:/admin/schedules";
     }

@@ -1,6 +1,6 @@
 package com.university.service;
 
-import com.university.model.Class;
+import com.university.model.SchoolClass;
 import com.university.model.Enrollment;
 import com.university.model.Student;
 import com.university.repository.EnrollmentRepository;
@@ -13,7 +13,7 @@ public class EnrollmentService {
     @Autowired
     private EnrollmentRepository enrollmentRepository;
 
-    public boolean isEnrolled(Student student, Class classEntity) {
+    public boolean isEnrolled(Student student, SchoolClass classEntity) {
         return enrollmentRepository.existsByStudentAndClassEntity(student, classEntity);
     }
 

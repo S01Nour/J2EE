@@ -1,6 +1,6 @@
 package com.university.controller;
 
-import com.university.model.Class;
+import com.university.model.SchoolClass;
 import com.university.model.Enrollment;
 import com.university.model.Schedule;
 import com.university.model.Student;
@@ -42,7 +42,7 @@ public class StudentController {
     public String viewSchedule(Model model) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Student student = studentService.findByEmail(email);
-        List<Class> classes = student.getClasses();
+        List<SchoolClass> classes = student.getClasses();
         List<Schedule> schedules = scheduleService.findByClasses(classes);
         model.addAttribute("schedules", schedules);
         return "student/schedule";
@@ -59,7 +59,7 @@ public class StudentController {
     public String enroll(@ModelAttribute("enrollment") Enrollment enrollment, Model model) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Student student = studentService.findByEmail(email);
-        Class classEntity = enrollment.getClassEntity();
+        SchoolClass classEntity = enrollment.getClassEntity();
 
         if (enrollmentService.isEnrolled(student, classEntity)) {
             model.addAttribute("error", "You are already enrolled in this class");

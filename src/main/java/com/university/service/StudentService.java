@@ -38,7 +38,10 @@ public class StudentService {
     }
 
     public Student findByEmail(String email) {
-        return studentRepository.findByEmail(email);
+        System.out.println("Attempting to find user with email: " + email);
+        Student user = studentRepository.findByEmail(email);
+        System.out.println("User found: " + (user != null ? user.getEmail() : "null"));
+        return user;
     }
 
     public List<Student> search(String keyword) {
