@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Date;
 import java.util.List;
-
 @Controller
 @RequestMapping("/student")
 @PreAuthorize("hasRole('STUDENT')")
@@ -40,12 +39,35 @@ public class StudentController {
 
     @GetMapping("/schedule")
     public String viewSchedule(Model model) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Student student = studentService.findByEmail(email);
-        List<SchoolClass> classes = student.getClasses();
-        List<Schedule> schedules = scheduleService.findByClasses(classes);
-        model.addAttribute("schedules", schedules);
-        return "student/schedule";
+        try {
+            // Get current logged-in student
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            Student student = studentService.findByEmail(email);
+
+            if (student == null) {
+                model.addAttribute("error", "Student not found");
+                return "error/404";
+            }
+
+            // Get student's enrolled classes
+            List<SchoolClass> classes = student.getClasses();
+
+            // Handle case where student has no classes
+            if (classes == null || classes.isEmpty()) {
+                model.addAttribute("schedules", List.of());
+                model.addAttribute("message", "You are not enrolled in any classes.");
+                return "student/schedule";
+            }
+
+            // Get schedules for classes
+            List<Schedule> schedules = scheduleService.findByClasses(classes);
+            model.addAttribute("schedules", schedules);
+            return "student/schedule";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Failed to load schedule: " + e.getMessage());
+            return "error/500";
+        }
     }
 
     @GetMapping("/enroll")
@@ -57,19 +79,32 @@ public class StudentController {
 
     @PostMapping("/enroll/save")
     public String enroll(@ModelAttribute("enrollment") Enrollment enrollment, Model model) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Student student = studentService.findByEmail(email);
-        SchoolClass classEntity = enrollment.getClassEntity();
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            Student student = studentService.findByEmail(email);
+            SchoolClass classEntity = enrollment.getClassEntity();
 
-        if (enrollmentService.isEnrolled(student, classEntity)) {
-            model.addAttribute("error", "You are already enrolled in this class");
+            if (classEntity == null) {
+                model.addAttribute("error", "Please select a valid class");
+                model.addAttribute("classes", classService.findAll());
+                return "student/enroll";
+            }
+
+            if (enrollmentService.isEnrolled(student, classEntity)) {
+                model.addAttribute("error", "You are already enrolled in this class");
+                model.addAttribute("classes", classService.findAll());
+                return "student/enroll";
+            }
+
+            enrollment.setStudent(student);
+            enrollment.setEnrollmentDate(new Date());
+            enrollmentService.save(enrollment);
+            return "redirect:/student/schedule";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Failed to enroll: " + e.getMessage());
             model.addAttribute("classes", classService.findAll());
             return "student/enroll";
         }
-
-        enrollment.setStudent(student);
-        enrollment.setEnrollmentDate(new Date());
-        enrollmentService.save(enrollment);
-        return "redirect:/student/schedule";
     }
 }

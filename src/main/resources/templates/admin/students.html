@@ -94,7 +94,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="student : ${students}">
+        <tr th:each="student : ${students}" th:if="${student.role == 'STUDENT'}">
             <td th:text="${student.studentId}"></td>
             <td th:text="${student.firstName}"></td>
             <td th:text="${student.lastName}"></td>
